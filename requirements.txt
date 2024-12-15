@@ -42,3 +42,4 @@ npm install @fortawesome/react-fontawesome @fortawesome/fontawesome-svg-core @fo
 npm install chart.js react-chartjs-2
 npm install aos
 npm install @types/aos
+#kolchay ye5dem

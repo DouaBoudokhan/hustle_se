@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Badge } from '../../components/Badge';
+import VoiceInput from '../../components/VoiceInput';
 
 
 interface UserProfile {
@@ -53,6 +54,14 @@ interface Employee {
   average_rating?: number;
 }
 
+interface AdviceData {
+  message: string;
+  feedback_count: number;
+  advice: string;
+  feedbacks: any[];
+  last_updated: string;
+}
+
 const ViewProfile: React.FC = () => {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -73,9 +82,6 @@ const ViewProfile: React.FC = () => {
   const [jobCreatorProfile, setJobCreatorProfile] = useState<UserProfile | null>(null);
   const [ratingExists, setRatingExists] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(0);
-  const [currentRating, setCurrentRating] = useState(0);
-  const [newRating, setNewRating] = useState(0);
-  const [showRatingForm, setShowRatingForm] = useState(false);
   const [ratingValue, setRatingValue] = useState(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [existingRatingId, setExistingRatingId] = useState<number | null>(null);
@@ -87,11 +93,18 @@ const ViewProfile: React.FC = () => {
     topPerformer: false,
     fiveStarCount: 0
   });
+  const [adviceData, setAdviceData] = useState<AdviceData | null>(null);
+  const [loadingAdvice, setLoadingAdvice] = useState(false);
 
   // D'abord, améliorons la fonction d'analyse de sentiment
   const analyzeSentimentWithHF = async (text: string) => {
     console.log('Analyzing sentiment for:', text);
     try {
+      if (!process.env.NEXT_PUBLIC_HF_API_KEY) {
+        console.error('HuggingFace API key not found');
+        return ratingValue;
+      }
+
       const response = await fetch(
         "https://api-inference.huggingface.co/models/nlptown/bert-base-multilingual-uncased-sentiment",
         {
@@ -103,8 +116,13 @@ const ViewProfile: React.FC = () => {
           body: JSON.stringify({ inputs: text }),
         }
       );
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze sentiment');
+      }
+
       const data = await response.json();
-      if (data[0] && data[0][0] && data[0][0].label) {
+      if (data[0]?.[0]?.label) {
         const rating = parseInt(data[0][0].label.charAt(0));
         return rating;
       }
@@ -225,7 +243,7 @@ const ViewProfile: React.FC = () => {
   // Calculate pagination indexes for accepted jobs
   const acceptedIndexOfLastJob = acceptedCurrentPage * jobsPerPage;
   const acceptedIndexOfFirstJob = acceptedIndexOfLastJob - jobsPerPage;
-  const currentAcceptedJobs = jobs.slice(acceptedIndexOfFirstJob, acceptedIndexOfLastJob);
+  const currentAcceptedJobs = acceptedRequests.slice(acceptedIndexOfFirstJob, acceptedIndexOfLastJob);
 
   // Calculate pagination indexes for pending requests
   const pendingIndexOfLastRequest = pendingCurrentPage * jobsPerPage;
@@ -341,11 +359,26 @@ const ViewProfile: React.FC = () => {
       const response = await fetch(
         `/api/rating?check_id_job=${jobId}&check_id_user=${userId}&check_id_subject=${subjectId}`
       );
-      const data = await response.json();
-      return data;
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const text = await response.text(); // First get the response as text
+      if (!text) {
+        return { exists: false, rating: null };
+      }
+
+      try {
+        const data = JSON.parse(text); // Then try to parse it
+        return data;
+      } catch (e) {
+        console.error('Failed to parse JSON:', text);
+        return { exists: false, rating: null };
+      }
     } catch (error) {
       console.error('Error checking existing rating:', error);
-      return null;
+      return { exists: false, rating: null };
     }
   };
 
@@ -470,6 +503,7 @@ const ViewProfile: React.FC = () => {
             await fetchJobCreatorProfile(jobCreatorProfile.id_profile);
           }
           await checkRating();
+          setFeedbackText('');
           const closeButton = document.querySelector('[data-bs-dismiss="modal"]') as HTMLElement;
           closeButton?.click();
         } else {
@@ -528,14 +562,6 @@ const ViewProfile: React.FC = () => {
       console.error('Error deleting rating:', error);
       alert('Failed to delete rating. Please try again.');
     }
-  };
-
-  const handleSubmit = async () => {
-    // Implement POST request to create new rating
-  };
-
-  const handleUpdateSubmit = async () => {
-    // Implement PATCH request to update existing rating
   };
 
   // Make sure we're getting the currentUserId when the component loads
@@ -659,6 +685,28 @@ const ViewProfile: React.FC = () => {
     };
 
     loadBadges();
+  }, [profile?.id_profile]);
+
+  const fetchAdvice = async (profileId: number) => {
+    console.log('Fetching advice for profile:', profileId);
+    setLoadingAdvice(true);
+    try {
+      const response = await fetch(`/api/rating?get_advice=${profileId}`);
+      if (!response.ok) throw new Error('Failed to fetch advice');
+      const data = await response.json();
+      console.log('Received advice data:', data);
+      setAdviceData(data);
+    } catch (error) {
+      console.error('Error fetching advice:', error);
+    } finally {
+      setLoadingAdvice(false);
+    }
+  };
+
+  useEffect(() => {
+    if (profile?.id_profile) {
+      fetchAdvice(profile.id_profile);
+    }
   }, [profile?.id_profile]);
 
   if (!profile) return <div>Loading...</div>;
@@ -1123,24 +1171,45 @@ const ViewProfile: React.FC = () => {
 
                       {/* Feedback textarea */}
                       <div className="mb-3">
-                        <label className="form-label">Feedback (optional)</label>
-                        <textarea
-                          className="form-control"
-                          value={feedbackText}
-                          onChange={async (e) => {
-                            const newValue = e.target.value;
-                            setFeedbackText(newValue);
-                            
-                            if (newValue.trim().length > 0) {
-                              const suggestedRating = await analyzeSentimentWithHF(newValue);
-                              if (suggestedRating !== ratingValue) {
-                                setRatingValue(suggestedRating);
+                        <label className="form-label">Feedback</label>
+                        <div className="position-relative">
+                          <textarea
+                            className="form-control"
+                            value={feedbackText}
+                            onChange={async (e) => {
+                              const newValue = e.target.value;
+                              setFeedbackText(newValue);
+                              
+                              if (newValue.trim().length > 0) {
+                                const suggestedRating = await analyzeSentimentWithHF(newValue);
+                                if (suggestedRating !== ratingValue) {
+                                  setRatingValue(suggestedRating);
+                                }
                               }
-                            }
-                          }}
-                          placeholder="Share your experience with this employer..."
-                          rows={4}
-                        />
+                            }}
+                            placeholder="Share your experience..."
+                            rows={4}
+                          />
+                          <div className="position-absolute" style={{ bottom: '12px', right: '12px' }}>
+                            <VoiceInput 
+                              onFeedbackComplete={(voiceText) => {
+                                setFeedbackText(voiceText);
+                                analyzeSentimentWithHF(voiceText);
+                              }}
+                              onTranscriptChange={(text) => {
+                                setFeedbackText(text);
+                              }}
+                              onSentimentChange={async (text) => {
+                                if (text.trim().length > 0) {
+                                  const suggestedRating = await analyzeSentimentWithHF(text);
+                                  if (suggestedRating !== ratingValue) {
+                                    setRatingValue(suggestedRating);
+                                  }
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                       {/* Submit button */}
@@ -1567,24 +1636,45 @@ const ViewProfile: React.FC = () => {
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label">Feedback (optional)</label>
-                    <textarea
-                      className="form-control"
-                      value={feedbackText}
-                      onChange={async (e) => {
-                        const newValue = e.target.value;
-                        setFeedbackText(newValue);
-                        
-                        if (newValue.trim().length > 0) {
-                          const suggestedRating = await analyzeSentimentWithHF(newValue);
-                          if (suggestedRating !== ratingValue) {
-                            setRatingValue(suggestedRating);
+                    <label className="form-label">Feedback</label>
+                    <div className="position-relative">
+                      <textarea
+                        className="form-control"
+                        value={feedbackText}
+                        onChange={async (e) => {
+                          const newValue = e.target.value;
+                          setFeedbackText(newValue);
+                          
+                          if (newValue.trim().length > 0) {
+                            const suggestedRating = await analyzeSentimentWithHF(newValue);
+                            if (suggestedRating !== ratingValue) {
+                              setRatingValue(suggestedRating);
+                            }
                           }
-                        }
-                      }}
-                      placeholder="Share your experience working with this employee..."
-                      rows={4}
-                    />
+                        }}
+                        placeholder="Share your experience..."
+                        rows={4}
+                      />
+                      <div className="position-absolute" style={{ bottom: '12px', right: '12px' }}>
+                        <VoiceInput 
+                          onFeedbackComplete={(voiceText) => {
+                            setFeedbackText(voiceText);
+                            analyzeSentimentWithHF(voiceText);
+                          }}
+                          onTranscriptChange={(text) => {
+                            setFeedbackText(text);
+                          }}
+                          onSentimentChange={async (text) => {
+                            if (text.trim().length > 0) {
+                              const suggestedRating = await analyzeSentimentWithHF(text);
+                              if (suggestedRating !== ratingValue) {
+                                setRatingValue(suggestedRating);
+                              }
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="d-flex gap-2 justify-content-end">

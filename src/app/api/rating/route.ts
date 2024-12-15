@@ -20,6 +20,86 @@ const containsInappropriateContent = (feedback: string): boolean => {
   );
 };
 
+// Add this new function before your route handlers
+async function generateAdvice(feedbacks: any[]) {
+  console.log('Generating advice for feedbacks:', feedbacks);
+
+  try {
+    // Prepare feedback summary
+    const feedbackSummary = feedbacks.map(feedback =>
+      `Rating: ${feedback.value}/5, Feedback: "${feedback.feedback}"`
+    ).join('\n');
+
+    const prompt = `You are an expert career advisor. Analyze these job performance reviews and provide detailed professional advice:
+
+${feedbackSummary}
+
+Please provide:
+1. A detailed analysis of their performance based on the ratings and feedback
+2. Specific strengths identified from positive feedback
+3. Clear areas for improvement based on critical feedback
+4. Actionable recommendations for professional growth
+5. Suggestions for handling difficult situations mentioned in the feedback
+
+Format your response with clear sections and bullet points. Be constructive and specific.`;
+
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROK_AI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messages: [{
+          role: "user",
+          content: prompt
+        }],
+        model: "grok-1",
+        max_tokens: 1000,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get Grok analysis');
+    }
+
+    const data = await response.json();
+    const advice = data.choices[0].message.content;
+
+    // If Grok fails to provide analysis, fall back to basic analysis
+    if (!advice) {
+      throw new Error('No advice generated');
+    }
+
+    return advice;
+
+  } catch (error) {
+    console.error('Error getting Grok analysis:', error);
+    
+    // Fallback to basic analysis
+    const averageRating = feedbacks.reduce((acc, f) => acc + Number(f.value), 0) / feedbacks.length;
+    const positiveFeedbacks = feedbacks.filter(f => Number(f.value) >= 4);
+    const negativeFeedbacks = feedbacks.filter(f => Number(f.value) <= 2);
+
+    return `Performance Analysis Based on ${feedbacks.length} Reviews
+
+Overall Performance:
+• Average Rating: ${averageRating.toFixed(1)}/5
+• Total Reviews: ${feedbacks.length}
+• Positive Reviews: ${positiveFeedbacks.length}
+• Areas for Improvement: ${negativeFeedbacks.length}
+
+Key Points:
+${feedbacks.map(f => `• Rating ${f.value}/5: ${f.feedback || 'No comment provided'}`).join('\n')}
+
+${averageRating >= 4 ? 'Overall excellent performance. Keep up the good work!' : 
+  averageRating >= 3 ? 'Good performance with some areas for improvement.' :
+  'Several areas need attention for improvement.'}
+`;
+  }
+}
+
 // CREATE (POST)
 export async function POST(request: Request) {
   const pool = initDB();
@@ -89,13 +169,35 @@ export async function GET(request: Request) {
       return NextResponse.json({ 
         exists: rating ? true : false,
         rating: rating || null
+      }, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
     }
     
-    return NextResponse.json({ exists: false, rating: null });
+    return NextResponse.json({ 
+      exists: false, 
+      rating: null 
+    }, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
   } catch (error) {
     console.error('Database query failed:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ 
+      message: 'Internal Server Error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, { 
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 }
 
