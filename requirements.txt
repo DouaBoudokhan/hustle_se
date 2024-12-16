@@ -43,3 +43,5 @@ npm install chart.js react-chartjs-2
 npm install aos
 npm install @types/aos
 #kolchay ye5dem
+npm install @mui/material @emotion/react @emotion/styled
+npm install @mui/icons-material

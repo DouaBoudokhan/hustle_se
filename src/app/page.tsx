@@ -2,19 +2,18 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import AOS from 'aos';
+import { Box, Button, Grid, Typography, Card, CardContent, Avatar, IconButton } from '@mui/material';
+import { LinkedIn, GitHub, Email } from '@mui/icons-material';
 
-// Import team images
-import nour from '@/app/assets/nour chokri.jpg';
-import hazem from '@/app/assets/hazem mbarek.jpg';
-import aalaedine from '@/app/assets/aalaedine kamoun.jpg';
-import mohamedAziz from '@/app/assets/mohamed aziz masmoudi.jpg';
-import douaa from '@/app/assets/douaa boudokhane.jpg';
-import ranim from '@/app/assets/ranim ammar.png';
+
 
 // Import hero section images
 import Image1 from '@/app/assets/1.jpeg';
 import Image2 from '@/app/assets/2.jpg';
 import Image3 from '@/app/assets/3.jpg';
+
+import 'aos/dist/aos.css';
+
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -34,19 +33,19 @@ export default function HomePage() {
   const testimonials = [
     {
       text: "The platform made it incredibly easy to find flexible work that fits my schedule. I'm impressed with the quality of opportunities available.",
-      name: "Sarah Johnson",
+      name: "Doua Boudokhan",
       role: "Student",
       image: "/assets/douaa boudokhane.jpg"
     },
     {
       text: "As an employer, I've found amazing talent through this platform. The process is streamlined and efficient.",
-      name: "Michael Chen",
+      name: "Nour Chokri",
       role: "Business Owner",
       image: "/assets/nour chokri.jpg"
     },
     {
       text: "The support team is exceptional, and the platform's features make job hunting a breeze. Highly recommended!",
-      name: "Emma Davis",
+      name: "Mohamed Aziz Masmoudi",
       role: "Freelancer",
       image: "/assets/mohamed aziz masmoudi.jpg"
     }
@@ -56,7 +55,7 @@ export default function HomePage() {
     {
       name: "Nour Chokri",
       role: "CEO & Founder",
-      image: nour,
+      image: '/assets/nour chokri.jpg',
       socials: {
         linkedin: "#",
         github: "#",
@@ -66,7 +65,7 @@ export default function HomePage() {
     {
       name: "Hazem Mbarek",
       role: "CTO",
-      image: hazem,
+      image: '/assets/hazem mbarek.jpg',
       socials: {
         linkedin: "#",
         github: "#",
@@ -76,7 +75,7 @@ export default function HomePage() {
     {
       name: "Aalaedine Kamoun",
       role: "Lead Backend Developer",
-      image: aalaedine,
+      image: '/assets/aalaedine kamoun.jpg',
       socials: {
         linkedin: "#",
         github: "#",
@@ -86,7 +85,7 @@ export default function HomePage() {
     {
       name: "Mohamed Aziz Masmoudi",
       role: "Lead Frontend Developer",
-      image: mohamedAziz,
+      image: '/assets/mohamed aziz masmoudi.jpg',
       socials: {
         linkedin: "#",
         github: "#",
@@ -96,7 +95,7 @@ export default function HomePage() {
     {
       name: "Douaa Boudokhane",
       role: "UI/UX Designer",
-      image: douaa,
+      image: '/assets/douaa boudokhane.jpg',
       socials: {
         linkedin: "#",
         github: "#",
@@ -106,7 +105,7 @@ export default function HomePage() {
     {
       name: "Ranim Ammar",
       role: "Product Manager",
-      image: ranim,
+      image: '/assets/ranim ammar.png',
       socials: {
         linkedin: "#",
         github: "#",
@@ -150,130 +149,127 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="min-vh-100 d-flex align-items-center py-5" data-aos="fade-up">
-        <div className="container">
-          <h2 className="text-center display-4 mb-5">Our Features</h2>
-          <div className="row g-4 justify-content-center">
-            <div className="col-md-4" data-aos="fade-up" data-aos-delay="100">
-              <div className="card h-100 border-0 shadow-sm p-4">
-                <div className="card-body text-center">
-                  <i className="bi bi-search display-4 mb-4" style={{ color: '#20B2AA' }}></i>
-                  <h3 className="h4 mb-3">Find Jobs</h3>
-                  <p className="text-muted">Discover perfect part-time opportunities tailored to your skills and schedule.</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-4" data-aos="fade-up" data-aos-delay="200">
-              <div className="card h-100 border-0 shadow-sm p-4">
-                <div className="card-body text-center">
-                  <i className="bi bi-people display-4 mb-4" style={{ color: '#20B2AA' }}></i>
-                  <h3 className="h4 mb-3">Connect</h3>
-                  <p className="text-muted">Connect directly with employers and build your professional network.</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-4" data-aos="fade-up" data-aos-delay="300">
-              <div className="card h-100 border-0 shadow-sm p-4">
-                <div className="card-body text-center">
-                  <i className="bi bi-graph-up display-4 mb-4" style={{ color: '#20B2AA' }}></i>
-                  <h3 className="h4 mb-3">Grow</h3>
-                  <p className="text-muted">Develop your skills and advance your career with flexible opportunities.</p>
-                </div>
-              </div>
-            </div>
+<section className="min-vh-100 d-flex align-items-center py-5" data-aos="fade-up">
+  <div className="container">
+    <h2 className="text-center display-4 mb-5">Our Features</h2>
+    <div className="row g-4 justify-content-center">
+      <div className="col-md-4" data-aos="fade-up" data-aos-delay="100" data-aos-duration="1000" data-aos-easing="ease-in-out">
+        <div className="card h-100 border-0 shadow-sm p-4">
+          <div className="card-body text-center">
+            <i className="bi bi-search display-4 mb-4" style={{ color: '#20B2AA' }}></i>
+            <h3 className="h4 mb-3">Find Jobs</h3>
+            <p className="text-muted">Discover perfect part-time opportunities tailored to your skills and schedule.</p>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Testimonials Section */}
-      <section className="min-vh-100 d-flex align-items-center py-5 bg-light" data-aos="fade-up">
-        <div className="container">
-          <h2 className="text-center display-4 mb-5">What People Say</h2>
-          <div className="position-relative">
-            <div className="testimonials-slider">
-              {testimonials.map((testimonial, index) => (
-                <div
-                  key={index}
-                  className={`testimonial-item text-center ${index === currentSlide ? 'active' : ''}`}
-                  style={{
-                    opacity: index === currentSlide ? 1 : 0,
-                    transform: `translateX(${(index - currentSlide) * 100}%)`,
-                    transition: 'all 0.5s ease-in-out'
-                  }}
-                >
-                  <div className="stars mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <i key={i} className="bi bi-star-fill text-warning"></i>
-                    ))}
-                  </div>
-                  <p className="testimonial-text mb-4 px-md-5">{testimonial.text}</p>
-                  <h5 className="mb-1">{testimonial.name}</h5>
-                  <p className="text-muted mb-0">{testimonial.role}</p>
-                </div>
+      <div className="col-md-4" data-aos="zoom-in" data-aos-delay="200" data-aos-duration="1000" data-aos-easing="ease-in-out">
+        <div className="card h-100 border-0 shadow-sm p-4">
+          <div className="card-body text-center">
+            <i className="bi bi-people display-4 mb-4" style={{ color: '#20B2AA' }}></i>
+            <h3 className="h4 mb-3">Connect</h3>
+            <p className="text-muted">Connect directly with employers and build your professional network.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="col-md-4" data-aos="flip-left" data-aos-delay="300" data-aos-duration="1000" data-aos-easing="ease-in-out">
+        <div className="card h-100 border-0 shadow-sm p-4">
+          <div className="card-body text-center">
+            <i className="bi bi-graph-up display-4 mb-4" style={{ color: '#20B2AA' }}></i>
+            <h3 className="h4 mb-3">Grow</h3>
+            <p className="text-muted">Develop your skills and advance your career with flexible opportunities.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+     {/* Testimonials Section */}
+<section className="min-vh-75 d-flex align-items-center py-3 bg-light" data-aos="fade-up">
+  <div className="container">
+    <h2 className="text-center display-4 mb-4">What People Say</h2>
+    <div className="position-relative">
+      <div className="testimonials-slider">
+        {testimonials.map((testimonial, index) => (
+          <div
+            key={index}
+            className={`testimonial-item text-center ${index === currentSlide ? 'active' : ''}`}
+            style={{
+              opacity: index === currentSlide ? 1 : 0,
+              transform: `translateX(${(index - currentSlide) * 100}%)`,
+              transition: 'all 0.5s ease-in-out'
+            }}
+          >
+            <div className="stars mb-3">
+              {[...Array(5)].map((_, i) => (
+                <i key={i} className="bi bi-star-fill text-warning"></i>
               ))}
             </div>
-            <div className="testimonial-dots d-flex justify-content-center gap-2 mt-4">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  className={`dot ${index === currentSlide ? 'active' : ''}`}
-                  onClick={() => setCurrentSlide(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                ></button>
-              ))}
-            </div>
+            <p className="testimonial-text mb-3 px-md-5">{testimonial.text}</p>
+            <h5 className="mb-1">{testimonial.name}</h5>
+            <p className="text-muted mb-0">{testimonial.role}</p>
           </div>
-        </div>
-      </section>
+        ))}
+      </div>
+      <div className="testimonial-dots d-flex justify-content-center gap-2 mt-3">
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            className={`dot ${index === currentSlide ? 'active' : ''}`}
+            onClick={() => setCurrentSlide(index)}
+            aria-label={`Go to slide ${index + 1}`}
+          ></button>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
 
-      {/* Team Section */}
-      <section className="min-vh-100 d-flex align-items-center py-5" data-aos="fade-up">
-        <div className="container">
-          <h2 className="text-center display-4 mb-5">Our Team</h2>
-          <div className="row g-4">
-            {teamMembers.map((member, index) => (
-              <div 
-                key={index} 
-                className="col-lg-4 col-md-6" 
-                data-aos="fade-up" 
-                data-aos-delay={100 * (index + 1)}
-              >
-                <div className="card team-card border-0 shadow-sm h-100">
-                  <div className="card-body text-center p-4">
-                    <div className="team-img-wrapper mb-4">
-                      <Image
-                        src={member.image}
-                        alt={member.name}
-                        width={200}
-                        height={200}
-                        className="rounded-circle img-fluid"
-                        style={{ 
-                          objectFit: 'cover',
-                          border: '4px solid #fff',
-                          boxShadow: '0 2px 15px rgba(0, 0, 0, 0.1)'
-                        }}
-                      />
-                    </div>
-                    <h5 className="card-title mb-1">{member.name}</h5>
-                    <p className="text-muted mb-3">{member.role}</p>
-                    <div className="social-links">
-                      <a href={member.socials.linkedin} className="mx-2" style={{ color: '#20B2AA' }}>
-                        <i className="bi bi-linkedin"></i>
-                      </a>
-                      <a href={member.socials.github} className="mx-2" style={{ color: '#20B2AA' }}>
-                        <i className="bi bi-github"></i>
-                      </a>
-                      <a href={member.socials.email} className="mx-2" style={{ color: '#20B2AA' }}>
-                        <i className="bi bi-envelope"></i>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
+     {/* Team Section */}
+      <Box sx={{ py: 5 }}>
+        <Typography variant="h3" align="center" sx={{ marginBottom: 10 }}>
+          Our Team
+        </Typography>
+        <Grid container spacing={1} justifyContent="center" sx={{ marginLeft: 2, marginRight: 2 }}>
+          {teamMembers.map((member, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index} data-aos="fade-up" data-aos-delay={100 * (index + 1)}>
+              <Card sx={{ boxShadow: 3, width: '95%' }}>
+                <CardContent sx={{ textAlign: 'center', padding: 2 }}>
+                  <Avatar
+                    alt={member.name}
+                    src={member.image}
+                    sx={{ width: 100, height: 100, marginBottom: 2, border: 4, borderColor: 'white' }}
+                  />
+                  <Typography variant="h6">{member.name}</Typography>
+                  <Typography variant="body2" color="textSecondary" sx={{ marginBottom: 2 }}>
+                    {member.role}
+                  </Typography>
+                  <Box>
+                    <IconButton href={member.socials.linkedin} sx={{ color: '#20B2AA' }}>
+                      <LinkedIn />
+                    </IconButton>
+                    <IconButton href={member.socials.github} sx={{ color: '#20B2AA' }}>
+                      <GitHub />
+                    </IconButton>
+                    <IconButton href={member.socials.email} sx={{ color: '#20B2AA' }}>
+                      <Email />
+                    </IconButton>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+      {/*end team section*/}
+
+
+
+
     </main>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { TextField, Button, Grid, MenuItem, Select, InputLabel, FormControl, Box, Typography } from '@mui/material';
 import { generateInterviewPDF } from '@/utils/pdfGenerator';
 
 interface JobFormData {
@@ -79,151 +80,144 @@ export default function JobAdd() {
   };
 
   return (
-    <main className="container my-4">
-      <div className="row justify-content-center">
-        <div className="col-md-8">
-          <div className="card shadow">
-            <div className="card-body">
-              <h2 className="card-title text-center mb-4">Post a New Job</h2>
+    <Box component="main" sx={{ my: 4 }}>
+      <Grid container justifyContent="center">
+        <Grid item xs={12} sm={8} md={6}>
+          <Box className="card shadow" sx={{ p: 3, borderRadius: 2 }}>
+            <Typography variant="h5" align="center" sx={{ mb: 4 }}>Post a New Job</Typography>
 
-              <form onSubmit={handleSubmit}>
-                {/* Job Title */}
-                <div className="mb-3">
-                  <label htmlFor="title" className="form-label">Job Title</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="title"
-                    name="title"
-                    value={formData.title}
+            <form onSubmit={handleSubmit}>
+              {/* Job Title */}
+              <TextField
+                label="Job Title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                fullWidth
+                required
+                sx={{ mb: 3 }}
+              />
+
+              {/* Job Description */}
+              <TextField
+                label="Description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                fullWidth
+                multiline
+                rows={4}
+                required
+                sx={{ mb: 3 }}
+              />
+
+              {/* Category */}
+              <FormControl fullWidth required sx={{ mb: 3 }}>
+                <InputLabel>Category</InputLabel>
+                <Select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  label="Category"
+                >
+                  <MenuItem value="">Select a category</MenuItem>
+                  <MenuItem value="Warehouse Worker">Warehouse Worker</MenuItem>
+                  <MenuItem value="Handyman">Handyman</MenuItem>
+                  <MenuItem value="Delivery">Delivery</MenuItem>
+                  <MenuItem value="Gardener">Gardener</MenuItem>
+                  <MenuItem value="Pet Sitter">Pet Sitter</MenuItem>
+                  <MenuItem value="Babysitter">Babysitter</MenuItem>
+                  <MenuItem value="Janitor">Janitor</MenuItem>
+                  <MenuItem value="Security Guard">Security Guard</MenuItem>
+                  <MenuItem value="Musician/Performer">Musician/Performer</MenuItem>
+                  <MenuItem value="Waiter/Cook">Waiter/Cook</MenuItem>
+                  <MenuItem value="Cashier">Cashier</MenuItem>
+                  <MenuItem value="Tutor">Tutor</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </Select>
+              </FormControl>
+
+              {/* Location and State */}
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Location"
+                    name="location"
+                    value={formData.location}
                     onChange={handleChange}
+                    fullWidth
                     required
+                    sx={{ mb: 3 }}
                   />
-                </div>
-
-                {/* Job Description */}
-                <div className="mb-3">
-                  <label htmlFor="description" className="form-label">Description</label>
-                  <textarea
-                    className="form-control"
-                    id="description"
-                    name="description"
-                    rows={4}
-                    value={formData.description}
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="State"
+                    name="state"
+                    value={formData.state}
                     onChange={handleChange}
+                    fullWidth
                     required
-                  ></textarea>
-                </div>
+                    sx={{ mb: 3 }}
+                  />
+                </Grid>
+              </Grid>
 
-                {/* Category */}
-                <div className="mb-3">
-                  <label htmlFor="category" className="form-label">Category</label>
-                  <select
-                    className="form-select"
-                    id="category"
-                    name="category"
-                    value={formData.category}
+              {/* Pay and Workers */}
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Pay Rate ($/hr)"
+                    name="pay"
+                    type="number"
+                    value={formData.pay}
                     onChange={handleChange}
+                    fullWidth
                     required
-                  >
-                    <option value="">Select a category</option>
-                    <option value="Warehouse Worker">Warehouse Worker</option>
-                    <option value="Handyman">Handyman</option>
-                    <option value="Delivery">Delivery</option>
-                    <option value="Gardener">Gardener</option>
-                    <option value="Pet Sitter">Pet Sitter</option>
-                    <option value="Babysitter">Babysitter</option>
-                    <option value="Janitor">Janitor</option>
-                    <option value="Security Guard">Security Guard</option>
-                    <option value="Musician/Performer">Musician/Performer</option>
-                    <option value="Waiter/Cook">Waiter/Cook</option>
-                    <option value="Cashier">Cashier</option>
-                    <option value="Tutor">Tutor</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
+                    sx={{ mb: 3 }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Number of Workers"
+                    name="num_workers"
+                    type="number"
+                    value={formData.num_workers}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                    sx={{ mb: 3 }}
+                  />
+                </Grid>
+              </Grid>
 
-                {/* Location and State */}
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="location" className="form-label">Location</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="state" className="form-label">State</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="state"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Pay and Workers */}
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label htmlFor="pay" className="form-label">Pay Rate ($/hr)</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      id="pay"
-                      name="pay"
-                      min="0"
-                      step="0.01"
-                      value={formData.pay}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label htmlFor="num_workers" className="form-label">Number of Workers</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      id="num_workers"
-                      name="num_workers"
-                      min="1"
-                      value={formData.num_workers}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <div className="d-grid gap-2">
-                  <button 
+              {/* Submit Button */}
+              <Grid container spacing={2} justifyContent="center">
+                <Grid item>
+                  <Button 
                     type="submit" 
-                    className="btn btn-success"
-                    style={{ backgroundColor: '#17a589', borderColor: '#17a589' }}
+                    variant="contained" 
+                    color="primary"
+                    sx={{ width: '100%', backgroundColor: '#17a589', '&:hover': { backgroundColor: '#15887e' } }}
                   >
                     Post Job
-                  </button>
-                  <button 
-                    type="button" 
-                    className="btn btn-outline-secondary"
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button 
+                    variant="outlined" 
+                    color="secondary" 
                     onClick={() => router.push('/job')}
+                    sx={{ width: '100%' }}
                   >
                     Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
